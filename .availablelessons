@@ -1,0 +1,14 @@
+[
+  {
+    "title": "Basics of Git",
+    "difficulty": "Basic",
+    "url": "https://github.com/Flame48/basics_of_git.git",
+    "to": "./basics_of_git/",
+    "setup_commands": [
+      "rm -rf ./basics_of_git/.git",
+      "touch ./basics_of_git/.gitignore",
+      "echo \".gitignore\n.lessonplan\" > ./basics_of_git/.gitignore"
+    ],
+    "cleanup_commands": []
+  }
+]
