@@ -2,6 +2,7 @@ import os
 import re
 import subprocess
 import json
+import time
 
 class LessonManager:
     
@@ -76,31 +77,45 @@ class LessonRunner:
         while self.step_index < len(self.steps):
             step = self.steps[self.step_index]
             print(f"\nStep {self.step_index + 1}:\n{step['explanation']}")
+            
+            reached_end: bool = ('end' in step) and step['end']
+            
+            if reached_end:
+                while True:
+                    user_input = input("> ").strip()
+                    self.command_history.append(user_input)
 
-            while True:
-                user_input = input("> ").strip()
-                self.command_history.append(user_input)
-
-                if user_input.startswith("!"):
-                    self.handle_app_command(user_input, step)
-                    continue
-
-                if self.is_expected_command(user_input, step):
-                    if ('end' in step) and step['end']:
+                    if self.is_expected_command(user_input, step):
                         return
-                    success = self.run_shell(user_input)
-                    if not success:
+
+                    if user_input.startswith("!"):
+                        self.handle_app_command(user_input, step)
                         continue
-                    print("Correct!")
-                    self.step_index += 1
-                    break
+                    else:
+                        # No limits anymore :)
+                        self.run_shell(user_input)
+            else:
+                while True:
+                    user_input = input("> ").strip()
+                    self.command_history.append(user_input)
 
-                elif self.is_neutral_command(user_input):
-                    self.run_shell(user_input)
+                    if user_input.startswith("!"):
+                        self.handle_app_command(user_input, step)
+                        continue
 
-                else:
-                    print("That's not the command we're looking for.")
-                    print("Type !hint if you're stuck.")
+                    if self.is_expected_command(user_input, step):
+                        success = self.run_shell(user_input)
+                        if not success:
+                            continue
+                        print("Correct!")
+                        time.sleep(4)
+                        self.step_index += 1
+                        break
+                    elif self.is_neutral_command(user_input):
+                        self.run_shell(user_input)
+                    else:
+                        print("That's not the command we're looking for.")
+                        print("Type !hint if you're stuck.")
 
         print("\n Lesson complete! Great job.")
 
